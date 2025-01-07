@@ -1,0 +1,49 @@
+name: build iOS simulator bundle
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-ios-simulator:
+    runs-on: macos-latest
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+
+      - name: setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: install Node dependencies
+        run: npm ci
+
+      - name: build Node app
+        run: npm run build
+
+      - name: sync web app
+        run: npx cap sync ios
+
+      - name: setup Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode.app
+          xcodebuild -version
+
+      - name: build .app file
+        working-directory: ios/App
+        run: |
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -derivedDataPath build
+
+      - name: upload .app artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-simulator-app
+          path: ios/App/build/Build/Products/Debug-iphonesimulator/App.app
