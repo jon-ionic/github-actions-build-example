@@ -1,4 +1,4 @@
-name: Build and Sign AAB
+name: build and sign AAB
 
 on:
   push:
@@ -13,7 +13,6 @@ jobs:
     env:
       JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
       ANDROID_HOME: ${{ secrets.ANDROID_HOME }}
-      PATH: ${{ secrets.ANDROID_HOME }}/cmdline-tools/latest/bin:${{ secrets.ANDROID_HOME }}/platform-tools:$PATH:/usr/bin:/bin
 
     steps:
       - name: checkout repo
@@ -38,9 +37,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
 
       - name: create AAB file
         working-directory: android
