@@ -1,0 +1,68 @@
+name: Build and Sign AAB
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-aab:
+    runs-on: ubuntu-latest
+
+    env:
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+      ANDROID_HOME: ${{ secrets.ANDROID_HOME }}
+      PATH: ${{ secrets.ANDROID_HOME }}/cmdline-tools/latest/bin:${{ secrets.ANDROID_HOME }}/platform-tools:$PATH
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: install node dependencies
+        run: npm ci
+
+      - name: sync project
+        run: npx cap sync android
+
+      - name: setup java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: setup android
+        uses: reactivecircus/android-emulator-runner@v3
+        with:
+          api-level: 34
+          target: default
+          ndk: none
+
+      - name: create AAB file
+        working-directory: android
+        run: ./gradlew bundleRelease
+
+      - name: sign AAB file
+        run: |
+          echo "${{ secrets.ANDROID_SIGNING_KEY }}" | base64 -d > release-key.jks
+          
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+            -keystore release-key.jks \
+            -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
+            -keypass ${{ secrets.KEY_PASSWORD }} \
+            app/build/outputs/bundle/release/app-release.aab ${{ secrets.KEY_ALIAS }}
+
+      - name: verify AAB file
+        run: |
+          jarsigner -verify -verbose -certs app/build/outputs/bundle/release/app-release.aab
+
+      - name: upload AAB artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: signed-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
