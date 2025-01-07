@@ -25,7 +25,7 @@ jobs:
       - name: build web project
         run: npm run build
 
-      - name: Sync Capacitor
+      - name: sync build
         run: npx cap sync ios
 
       - name: setup Xcode
