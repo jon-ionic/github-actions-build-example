@@ -27,6 +27,9 @@ jobs:
       - name: install node dependencies
         run: npm ci
 
+      - name: build project
+        run: npm run build
+
       - name: sync project
         run: npx cap sync android
 
