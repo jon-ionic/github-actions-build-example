@@ -39,11 +39,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: setup android
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          script: ./gradlew connectedCheck
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: create AAB file
         working-directory: android
