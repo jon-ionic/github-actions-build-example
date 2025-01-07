@@ -56,14 +56,17 @@ jobs:
           mv provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
       - name: build IPA
+        working-directory: ios/App
         run: |
-          cd ios/App
           xcodebuild -workspace App.xcworkspace \
             -scheme App \
             -sdk iphoneos \
             -configuration Release \
             -archivePath $PWD/build/App.xcarchive archive
 
+      - name: export IPA
+        working-directory: ios/App
+        run: |
           xcodebuild -exportArchive \
             -archivePath $PWD/build/App.xcarchive \
             -exportPath $PWD/build \
