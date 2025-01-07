@@ -37,11 +37,9 @@ jobs:
           java-version: '17'
 
       - name: setup android
-        uses: reactivecircus/android-emulator-runner@v3
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
-          target: default
-          ndk: none
 
       - name: create AAB file
         working-directory: android
