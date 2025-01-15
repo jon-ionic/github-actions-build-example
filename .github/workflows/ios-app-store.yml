@@ -66,10 +66,10 @@ jobs:
         run: xcodebuild -workspace './ios/App/App.xcworkspace' -scheme App -destination generic/platform=iOS -archivePath App.xcarchive archive
 
       - name: create .ipa
-        run: xcodebuild archive -archivePath App.xcarchive -exportArchive -exportOptionsPlist ./ios/archive.plist -exportPath output -allowProvisioningUpdates
+        run: xcodebuild archive -archivePath App.xcarchive -exportArchive -exportOptionsPlist ./ios/archive.plist -exportPath output.ipa -allowProvisioningUpdates
 
       - name: upload IPA artifact
         uses: actions/upload-artifact@v3
         with:
-          name: app-store-ipa
-          path: ios/App/build/App.ipa
+          name: app-store-ipa.ipa
+          path: /Users/runner/work/github-actions-build-example/github-actions-build-example/output.ipa
