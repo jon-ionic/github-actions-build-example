@@ -62,23 +62,11 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
-      - name: build IPA
-        run: |
-          xcodebuild -workspace './ios/App/App.xcworkspace' \
-            -scheme App \
-            -sdk iphoneos \
-            -destination generic/platform=iOS \
-            -configuration Release \
-            -archivePath $PWD/build/App.xcarchive \
-            archive
+      - name: build project
+        run: xcodebuild -workspace './ios/App/App.xcworkspace' -scheme App -destination generic/platform=iOS -archivePath App.xcarchive archive
 
-      - name: export IPA
-        working-directory: ios/App
-        run: |
-          xcodebuild -exportArchive \
-            -archivePath $PWD/build/App.xcarchive \
-            -exportPath $PWD/build \
-            -exportOptionsPlist exportOptions.plist
+      - name: create .ipa
+        run: xcodebuild archive -archivePath App.xcarchive -exportArchive -exportOptionsPlist ./ios/archive.plist -exportPath output -allowProvisioningUpdates
 
       - name: upload IPA artifact
         uses: actions/upload-artifact@v3
